@@ -4,6 +4,7 @@ import pandas as pd
 import mlflow
 import mlflow.sklearn
 import joblib
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -56,11 +57,14 @@ with mlflow.start_run():
     clf = RandomForestClassifier(random_state=42, class_weight=cw_dict)
     clf.fit(X_train_scaled, y_train)
 
-    mlflow.sklearn.log_model(
+
+mlflow.sklearn.log_model(
     sk_model=clf,
-    artifact_path="model",
-    input_example=X_train_scaled[:1]
+    artifact_path=args.output,
+    input_example=np.array(X_train_scaled[:1]),
+    registered_model_name=None
 )
+
 
     # Simpan model
     model_path = os.path.join(args.output, 'model_sleep.joblib')

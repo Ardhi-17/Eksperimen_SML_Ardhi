@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - 'workflow-CI/**'
-  workflow_dispatch:
 
 
 

@@ -1,0 +1,11 @@
+name: sleep-disorder-env
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pandas
+  - scikit-learn
+  - mlflow==2.2.2
+  - pip
+  - pip:
+      - joblib

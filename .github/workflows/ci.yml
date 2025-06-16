@@ -34,3 +34,16 @@ jobs:
         with:
           name: sleep-disorder-model
           path: artifacts/
+
+      - name: Build MLflow Docker image
+        run: |
+          mlflow models build-docker -m artifacts/sleep-disorder-model -n sleep-disorder-model
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker tag sleep-disorder-model ardhi17/sleep-disorder-model
+          docker push ardhi17/sleep-disorder-model
+  

@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.class_weight import compute_class_weight
 
-# === Parsing argument CLI ===
+# === Parsing CLI argument ===
 parser = argparse.ArgumentParser(description="Train RandomForest for Sleep Disorder")
 parser.add_argument('--input', type=str, required=True, help='Path to input CSV dataset')
 parser.add_argument('--output', type=str, default="artifacts/sleep-disorder-model", help='Path to save model artifacts')
@@ -18,9 +18,6 @@ args = parser.parse_args()
 
 # === Buat direktori output jika belum ada ===
 os.makedirs(args.output, exist_ok=True)
-
-# === Nonaktifkan autologging untuk kompatibilitas ===
-# mlflow.sklearn.autolog()
 
 # === Load dataset ===
 df = pd.read_csv(args.input)
@@ -39,7 +36,7 @@ y = df[target]
 # === Split data ===
 X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2, random_state=42)
 
-# === Standardisasi ===
+# === Standardisasi fitur numerik ===
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
@@ -48,20 +45,20 @@ X_test_scaled = scaler.transform(X_test)
 scaler_path = os.path.join(args.output, 'scaler_sleep.joblib')
 joblib.dump(scaler, scaler_path)
 
-# === Class weight ===
+# === Class weight untuk data imbang ===
 class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
 cw_dict = dict(zip(np.unique(y_train), class_weights))
 
-# === Konversi y_train dan y_test ke NumPy array ===
+# === Konversi ke array (untuk kompatibilitas dengan mlflow) ===
 y_train = np.array(y_train)
-y_test = np.array(y_test)
 
-# === Mulai MLflow run ===
+# === Start MLflow run ===
 with mlflow.start_run():
+    # Latih model
     clf = RandomForestClassifier(random_state=42, class_weight=cw_dict)
     clf.fit(X_train_scaled, y_train)
 
-    # Logging model ke MLflow
+    # Log model ke MLflow Tracking (dengan input_example)
     mlflow.sklearn.log_model(
         sk_model=clf,
         artifact_path="sleep-disorder-model",
@@ -69,7 +66,7 @@ with mlflow.start_run():
         registered_model_name=None
     )
 
-    # Simpan model ke subdirektori lokal untuk build Docker
+    # Simpan model dalam format MLflow (untuk build Docker)
     mlflow_model_path = os.path.join(args.output, 'mlflow_model')
     mlflow.sklearn.save_model(
         sk_model=clf,
@@ -77,8 +74,8 @@ with mlflow.start_run():
         input_example=X_train_scaled[:1]
     )
 
-    # Simpan versi lokal juga (jaga-jaga)
+    # Simpan juga sebagai joblib biasa
     model_path = os.path.join(args.output, 'model_sleep.joblib')
     joblib.dump(clf, model_path)
 
-print("[✓] Model selesai dilatih dan disimpan ke:", args.output)
+print(f"[✓] Model selesai dilatih dan disimpan ke: {args.output}")

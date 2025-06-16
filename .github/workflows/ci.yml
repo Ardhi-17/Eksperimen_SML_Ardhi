@@ -1,49 +1,50 @@
-name: CI - MLflow Project
+name: CI - Train and Build Docker for Sleep Disorder Model
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: write
+
 jobs:
-  run-mlflow:
+  train-and-build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout kode
         uses: actions/checkout@v3
 
       - name: Setup Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r MLProject/requirements.txt
 
-      - name: Run training
+      - name: Jalankan training dengan modelling.py
         run: |
           python MLProject/modelling.py \
             --input MLProject/Sleep_health_and_lifestyle_dataset_preprocessed.csv \
-            --output artifacts
+            --output artifacts/sleep-disorder-model
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: sleep-disorder-model
-          path: artifacts/
-
-      - name: Build MLflow Docker image
+      - name: Build Docker image dari model MLflow
         run: |
           mlflow models build-docker -m artifacts/sleep-disorder-model -n sleep-disorder-model
 
-      - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
-
-      - name: Push Docker image to Docker Hub
+      - name: Login ke Docker Hub
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_HUB_PASSWORD }}
         run: |
-          docker tag sleep-disorder-model ardhi17/sleep-disorder-model
-          docker push ardhi17/sleep-disorder-model
-  
+          echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+      - name: Tag dan push Docker image
+        run: |
+          docker tag sleep-disorder-model ${{ secrets.DOCKER_HUB_USERNAME }}/sleep-disorder-model:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/sleep-disorder-model:latest

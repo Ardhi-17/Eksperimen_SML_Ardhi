@@ -88,10 +88,8 @@ def preprocess_pipeline(path_in, path_out):
     print(f"[✓] Preprocessed dataset saved at: {path_out}")
 
 if __name__ == '__main__':
-    # Lokasi file input/output
     root_dir = os.path.dirname(__file__)
-    base_dir = os.path.abspath(os.path.join(root_dir, '..'))
-    raw_csv = os.path.join(base_dir, 'namadataset_raw', 'Sleep_health_and_lifestyle_dataset.csv')
+    raw_csv = os.path.abspath(os.path.join(root_dir, '..', 'namadataset_raw', 'Sleep_health_and_lifestyle_dataset.csv'))
     output_csv = os.path.join(root_dir, 'namadataset_preprocessing', 'Sleep_health_and_lifestyle_dataset_preprocessed.csv')
 
     preprocess_pipeline(raw_csv, output_csv)

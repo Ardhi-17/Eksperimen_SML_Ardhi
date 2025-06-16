@@ -3,7 +3,7 @@ name: CI - MLflow Project (Python Run with pip)
 permissions:
   contents: write
   actions: write
-  
+
 on:
   push:
     branches: [ main, master ]
@@ -29,8 +29,17 @@ jobs:
 
     - name: Jalankan skrip modelling.py
       run: |
-        python MLProject/modelling.py
+        python MLProject/modelling.py \
+          --input MLProject/Sleep_health_and_lifestyle_dataset_preprocessed.csv \
+          --output artifacts/model
 
-      - name: Train model with MLflow Project
-        run: |
-          cd MLProject
+    - name: Periksa isi artifacts
+      run: |
+        echo "=== LIST ARTIFAKS ==="
+        ls -R artifacts
+
+    - name: Upload artefak model
+      uses: actions/upload-artifact@v4
+      with:
+        name: trained-model
+        path: artifacts/model

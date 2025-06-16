@@ -19,7 +19,7 @@ args = parser.parse_args()
 # === Buat direktori output jika belum ada ===
 os.makedirs(args.output, exist_ok=True)
 
-# === Nonaktifkan autologging untuk menghindari error ===
+# === Nonaktifkan autologging untuk kompatibilitas ===
 # mlflow.sklearn.autolog()
 
 # === Load dataset ===

@@ -1,0 +1,10 @@
+name: workflow-ci-mlproject
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      input_data: {type: str}
+      output_model_path: {type: str, default: "model"}
+    command: >
+      python modelling.py --input {input_data} --output {output_model_path}

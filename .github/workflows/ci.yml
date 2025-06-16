@@ -33,6 +33,10 @@ jobs:
             --input MLProject/Sleep_health_and_lifestyle_dataset_preprocessed.csv \
             --output artifacts/sleep-disorder-model
 
+      - name: Periksa isi direktori artifacts
+        run: |
+          ls -lR artifacts/sleep-disorder-model
+
       - name: Login ke Docker Hub
         uses: docker/login-action@v3
         with:

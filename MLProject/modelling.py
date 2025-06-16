@@ -56,6 +56,12 @@ with mlflow.start_run():
     clf = RandomForestClassifier(random_state=42, class_weight=cw_dict)
     clf.fit(X_train_scaled, y_train)
 
+    mlflow.sklearn.log_model(
+    sk_model=clf,
+    artifact_path="model",
+    input_example=X_train_scaled[:1]
+)
+
     # Simpan model
     model_path = os.path.join(args.output, 'model_sleep.joblib')
     joblib.dump(clf, model_path)

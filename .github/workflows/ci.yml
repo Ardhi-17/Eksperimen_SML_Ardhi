@@ -47,4 +47,4 @@ jobs:
       - name: Tag dan push Docker image
         run: |
           docker tag sleep-disorder-model ${{ secrets.DOCKER_HUB_USERNAME }}/sleep-disorder-model:latest
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/sleep-disorder-model:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/sleep-disorder-model:latest 

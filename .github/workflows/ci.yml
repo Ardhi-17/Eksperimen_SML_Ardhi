@@ -27,20 +27,10 @@ jobs:
         pip install --upgrade pip
         pip install -r MLProject/requirements.txt
 
-    - name: Buat folder artifacts
-      run: mkdir -p artifacts/model
-
     - name: Jalankan skrip modelling.py
       run: |
-        python workflow-CI/MLProject/modelling.py
+        python MLProject/modelling.py
 
-    - name: Periksa isi artifacts
-      run: |
-        echo "=== LIST ARTIFAKS ==="
-        ls -R artifacts
-
-    - name: Upload artefak model
-      uses: actions/upload-artifact@v4
-      with:
-        name: trained-model
-        path: artifacts/model
+      - name: Train model with MLflow Project
+        run: |
+          cd MLProject

@@ -1,8 +1,12 @@
 name: CI - MLflow Project (Python Run with pip)
 
+permissions:
+  contents: write
+  actions: write
+  
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:

@@ -3,7 +3,8 @@ name: Train Model on Push
 on:
   push:
     paths:
-      - 'MLProject/**'
+      - 'workflow-CI/**'
+
 
 jobs:
   train:

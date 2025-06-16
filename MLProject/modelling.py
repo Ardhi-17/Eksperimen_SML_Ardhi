@@ -49,8 +49,12 @@ scaler_path = os.path.join(args.output, 'scaler_sleep.joblib')
 joblib.dump(scaler, scaler_path)
 
 # === Class weight ===
-class_weights = compute_class_weight(class_weight='balanced', classes=pd.unique(y_train), y=y_train)
-cw_dict = dict(zip(pd.unique(y_train), class_weights))
+class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
+cw_dict = dict(zip(np.unique(y_train), class_weights))
+
+# === Konversi y_train dan y_test ke NumPy array untuk MLflow autologging ===
+y_train = np.array(y_train)
+y_test = np.array(y_test)
 
 # === Mulai MLflow run ===
 with mlflow.start_run():
@@ -60,16 +64,17 @@ with mlflow.start_run():
     # Logging model ke MLflow
     mlflow.sklearn.log_model(
         sk_model=clf,
-        artifact_path="sleep-disorder-model",  # Artifact path untuk MLflow tracking
-        input_example=np.array(X_train_scaled[:1]),
+        artifact_path="sleep-disorder-model",
+        input_example=X_train_scaled[:1],
         registered_model_name=None
     )
 
-    # Simpan model ke direktori lokal untuk build Docker
+    # Simpan model ke subdirektori lokal untuk build Docker
+    mlflow_model_path = os.path.join(args.output, 'mlflow_model')
     mlflow.sklearn.save_model(
         sk_model=clf,
-        path=args.output,  # Simpan langsung ke direktori lokal
-        input_example=np.array(X_train_scaled[:1])
+        path=mlflow_model_path,
+        input_example=X_train_scaled[:1]
     )
 
     # Simpan versi lokal juga (jaga-jaga)

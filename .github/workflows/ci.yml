@@ -13,6 +13,15 @@ jobs:
   train-and-build:
     runs-on: ubuntu-latest
 
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
+        ports:
+          - 2375:2375
+        env:
+          DOCKER_TLS_CERTDIR: ""
+
     steps:
       - name: Checkout kode
         uses: actions/checkout@v3
@@ -21,6 +30,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+
+      - name: Install Docker client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
 
       - name: Install dependencies
         run: |
@@ -37,6 +51,14 @@ jobs:
         run: |
           ls -lR artifacts/sleep-disorder-model
 
+      - name: Periksa status Docker
+        run: |
+          docker info
+
+      - name: Cetak variabel lingkungan Docker
+        run: |
+          env | grep DOCKER
+
       - name: Login ke Docker Hub
         uses: docker/login-action@v3
         with:
@@ -44,6 +66,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image dari model
+        env:
+          DOCKER_HOST: tcp://localhost:2375
         run: |
           mlflow models build-docker -m artifacts/sleep-disorder-model/mlflow_model -n sleep-disorder-model
 

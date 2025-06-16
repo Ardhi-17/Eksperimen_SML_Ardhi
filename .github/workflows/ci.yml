@@ -45,7 +45,7 @@ jobs:
 
       - name: Build Docker image dari model
         run: |
-          mlflow models build-docker -m artifacts/sleep-disorder-model -n sleep-disorder-model
+          mlflow models build-docker -m artifacts/sleep-disorder-model/mlflow_model -n sleep-disorder-model
 
       - name: Tag dan Push image ke Docker Hub
         run: |

@@ -19,8 +19,8 @@ args = parser.parse_args()
 # === Buat direktori output jika belum ada ===
 os.makedirs(args.output, exist_ok=True)
 
-# === Aktifkan autolog MLflow ===
-mlflow.sklearn.autolog()
+# === Nonaktifkan autologging untuk menghindari error ===
+# mlflow.sklearn.autolog()
 
 # === Load dataset ===
 df = pd.read_csv(args.input)
@@ -52,7 +52,7 @@ joblib.dump(scaler, scaler_path)
 class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
 cw_dict = dict(zip(np.unique(y_train), class_weights))
 
-# === Konversi y_train dan y_test ke NumPy array untuk MLflow autologging ===
+# === Konversi y_train dan y_test ke NumPy array ===
 y_train = np.array(y_train)
 y_test = np.array(y_test)
 

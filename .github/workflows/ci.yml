@@ -31,18 +31,20 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: network=host
+      - name: Create and activate virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          source venv/bin/activate
           pip install -r MLProject/requirements.txt
 
       - name: Jalankan training dengan modelling.py
         run: |
+          source venv/bin/activate
           python MLProject/modelling.py \
             --input MLProject/Sleep_health_and_lifestyle_dataset_preprocessed.csv \
             --output artifacts/sleep-disorder-model
@@ -69,6 +71,7 @@ jobs:
         env:
           DOCKER_HOST: tcp://localhost:2375
         run: |
+          source venv/bin/activate
           mlflow models build-docker -m artifacts/sleep-disorder-model/mlflow_model -n sleep-disorder-model
 
       - name: Tag dan Push image ke Docker Hub

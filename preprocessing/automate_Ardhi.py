@@ -90,8 +90,7 @@ def preprocess_pipeline(path_in, path_out):
 if __name__ == '__main__':
     # Lokasi input/output
     root_dir = os.path.dirname(__file__)
-    # Nama file mentah dan preprocessed yang kamu pakai
-    raw_csv = os.path.join(os.getcwd(), 'Sleep_health_and_lifestyle_dataset.csv')
+    raw_csv = os.path.join(os.getcwd(), 'namadataset_raw', 'Sleep_health_and_lifestyle_dataset.csv')
     output_csv = os.path.join(root_dir, 'namadataset_preprocessing', 'Sleep_health_and_lifestyle_dataset_preprocessed.csv')
 
     preprocess_pipeline(raw_csv, output_csv)

@@ -57,12 +57,19 @@ with mlflow.start_run():
     clf = RandomForestClassifier(random_state=42, class_weight=cw_dict)
     clf.fit(X_train_scaled, y_train)
 
-    # Logging model ke MLflow dan direktori agar bisa dibuild Docker
+    # Logging model ke MLflow
     mlflow.sklearn.log_model(
         sk_model=clf,
-        artifact_path=args.output,
+        artifact_path="sleep-disorder-model",  # Artifact path untuk MLflow tracking
         input_example=np.array(X_train_scaled[:1]),
         registered_model_name=None
+    )
+
+    # Simpan model ke direktori lokal untuk build Docker
+    mlflow.sklearn.save_model(
+        sk_model=clf,
+        path=args.output,  # Simpan langsung ke direktori lokal
+        input_example=np.array(X_train_scaled[:1])
     )
 
     # Simpan versi lokal juga (jaga-jaga)

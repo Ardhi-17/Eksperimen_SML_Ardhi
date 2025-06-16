@@ -2,8 +2,14 @@ name: CI - Train and Build Docker for Sleep Disorder Model
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main
+    paths-ignore:
+      - 'mlruns/**'
+      - '.gitattributes'
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -13,23 +19,22 @@ jobs:
   train-and-build:
     runs-on: ubuntu-latest
 
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged
-        ports:
-          - 2375:2375
-        env:
-          DOCKER_TLS_CERTDIR: ""
-
     steps:
       - name: Checkout kode
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+          lfs: true
 
-      - name: Setup Python 3.10
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
 
       - name: Create and activate virtual environment
         run: |
@@ -41,6 +46,11 @@ jobs:
         run: |
           source venv/bin/activate
           pip install -r MLProject/requirements.txt
+
+      - name: Cetak versi dependensi
+        run: |
+          source venv/bin/activate
+          pip show mlflow scikit-learn docker
 
       - name: Jalankan training dengan modelling.py
         run: |
@@ -55,11 +65,30 @@ jobs:
 
       - name: Periksa status Docker
         run: |
-          docker info
+          docker info --format '{{.ServerVersion}}'
 
       - name: Cetak variabel lingkungan Docker
         run: |
           env | grep DOCKER
+
+      - name: Git config
+        run: |
+          git config --global user.name "${{ secrets.username }}"
+          git config --global user.email "${{ secrets.email }}"
+
+      - name: Git LFS track
+        run: |
+          git lfs install
+          git lfs track "mlruns/**"
+          git add .gitattributes
+          git commit -m "Track large files in mlruns with Git LFS" || true
+          git push origin main
+
+      - name: Save mlruns to repo
+        run: |
+          git add -f mlruns/
+          git commit -m "Save mlruns from CI run" || true
+          git push origin main
 
       - name: Login ke Docker Hub
         uses: docker/login-action@v3
@@ -68,8 +97,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image dari model
-        env:
-          DOCKER_HOST: tcp://localhost:2375
         run: |
           source venv/bin/activate
           mlflow models build-docker -m artifacts/sleep-disorder-model/mlflow_model -n sleep-disorder-model

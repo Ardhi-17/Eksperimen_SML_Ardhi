@@ -44,11 +44,11 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# === Simpan scaler ===
+# === Simpan scaler (optional) ===
 scaler_path = os.path.join(args.output, 'scaler_sleep.joblib')
 joblib.dump(scaler, scaler_path)
 
-# === Class weight ===
+# === Hitung class weight ===
 class_weights = compute_class_weight(class_weight='balanced', classes=pd.unique(y_train), y=y_train)
 cw_dict = dict(zip(pd.unique(y_train), class_weights))
 
@@ -57,17 +57,16 @@ with mlflow.start_run():
     clf = RandomForestClassifier(random_state=42, class_weight=cw_dict)
     clf.fit(X_train_scaled, y_train)
 
-
-mlflow.sklearn.log_model(
-    sk_model=clf,
-    artifact_path=args.output,
-    input_example=np.array(X_train_scaled[:1]),
-    registered_model_name=None
-)
-
-
-    # Simpan model
+    # === Simpan model (opsional untuk pengguna manual) ===
     model_path = os.path.join(args.output, 'model_sleep.joblib')
     joblib.dump(clf, model_path)
+
+    # === Log model ke MLflow (agar bisa build-docker) ===
+    mlflow.sklearn.log_model(
+        sk_model=clf,
+        artifact_path=args.output,
+        input_example=np.array(X_train_scaled[:1]),
+        registered_model_name=None
+    )
 
 print("[✓] Model selesai dilatih dan disimpan.")

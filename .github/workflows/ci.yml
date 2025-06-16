@@ -29,25 +29,21 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r MLProject/requirements.txt
 
-      - name: Train model with modelling.py
+      - name: Jalankan training dengan modelling.py
         run: |
           python MLProject/modelling.py \
             --input MLProject/Sleep_health_and_lifestyle_dataset_preprocessed.csv \
             --output artifacts/sleep-disorder-model
 
-      - name: Cek hasil artifacts
-        run: |
-          ls -lR artifacts/sleep-disorder-model
+      - name: Cek isi artifacts
+        run: ls -lR artifacts/sleep-disorder-model
 
-      - name: Push MLflow log to GitHub
+      - name: Push MLflow log ke GitHub
         run: |
           git config --global user.name "${{ secrets.username }}"
           git config --global user.email "${{ secrets.email }}"
@@ -57,17 +53,17 @@ jobs:
           git commit -m "Track & push MLflow logs" || true
           git push origin main
 
-      - name: Login to Docker Hub
+      - name: Login ke Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker image from MLflow model
+      - name: Build Docker image dari model
         run: |
           mlflow models build-docker -m artifacts/sleep-disorder-model/mlflow_model -n sleep-disorder-model
 
-      - name: Push Docker image to Docker Hub
+      - name: Tag & Push image ke Docker Hub
         run: |
           docker tag sleep-disorder-model ${{ secrets.DOCKERHUB_USERNAME }}/msml-ardhi:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/msml-ardhi:latest

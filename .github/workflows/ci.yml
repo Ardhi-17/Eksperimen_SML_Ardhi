@@ -1,45 +1,36 @@
-name: CI - MLflow Project (Python Run with pip)
-
-permissions:
-  contents: write
-  actions: write
+name: CI - MLflow Project
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  run-mlflow-script:
+  run-mlflow:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout kode
-      uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Setup Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
-    - name: Install dependencies via pip
-      run: |
-        pip install --upgrade pip
-        pip install -r MLProject/requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r MLProject/requirements.txt
 
-    - name: Jalankan skrip modelling.py
-      run: |
-        python MLProject/modelling.py \
-          --input MLProject/Sleep_health_and_lifestyle_dataset_preprocessed.csv \
-          --output artifacts/model
+      - name: Run training
+        run: |
+          python MLProject/modelling.py \
+            --input MLProject/Sleep_health_and_lifestyle_dataset_preprocessed.csv \
+            --output artifacts
 
-    - name: Periksa isi artifacts
-      run: |
-        echo "=== LIST ARTIFAKS ==="
-        ls -R artifacts
-
-    - name: Upload artefak model
-      uses: actions/upload-artifact@v4
-      with:
-        name: trained-model
-        path: artifacts/model
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sleep-disorder-model
+          path: artifacts/

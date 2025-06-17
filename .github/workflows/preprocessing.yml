@@ -34,7 +34,7 @@ jobs:
       - name: Run preprocessing
         run: |
           cd preprocessing
-          python automate.py
+          python automate_Ardhi.py
 
       - name: Commit and push preprocessed data
         run: |

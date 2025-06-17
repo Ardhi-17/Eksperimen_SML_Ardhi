@@ -6,7 +6,7 @@ on:
       - 'preprocessing/automate.py'
       - 'namadataset_raw/**'
       - 'preprocessing/requirements.txt'
-      - '.github/workflows/preprocessing.yml' 
+      - '.github/workflows/preprocessing.yml'
   pull_request:
     paths:
       - 'preprocessing/automate.py'

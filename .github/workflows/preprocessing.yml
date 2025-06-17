@@ -5,13 +5,13 @@ on:
     paths:
       - 'preprocessing/automate.py'
       - 'namadataset_raw/**'
-      - 'requirements.txt'
+      - 'preprocessing/requirements.txt'
       - '.github/workflows/preprocessing.yml'
   pull_request:
     paths:
       - 'preprocessing/automate.py'
       - 'namadataset_raw/**'
-      - 'requirements.txt'
+      - 'preprocessing/requirements.txt'
       - '.github/workflows/preprocessing.yml'
 
 jobs:

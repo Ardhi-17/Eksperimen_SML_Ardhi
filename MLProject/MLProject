@@ -1,10 +1,10 @@
-name: workflow-ci-mlproject
+name: sleep-disorder-pipeline
+
 conda_env: conda.yaml
 
 entry_points:
   main:
     parameters:
-      input_data: {type: str}
-      output_model_path: {type: str, default: "model"}
+      dataset: {type: str, default: "namadataset_preprocessing/Sleep_health_and_lifestyle_dataset_preprocessed.csv"}
     command: >
-      python modelling.py --input {input_data} --output {output_model_path}
+      python modelling.py --dataset {dataset}

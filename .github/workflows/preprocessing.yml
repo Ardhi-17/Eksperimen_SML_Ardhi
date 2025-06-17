@@ -11,7 +11,7 @@ on:
     paths:
       - 'preprocessing/automate.py'
       - 'namadataset_raw/**'
-      - 'preprocessing/requirements.txt'
+      - 'preprocessing/requirements.txt' 
       - '.github/workflows/preprocessing.yml'
 
 jobs:
